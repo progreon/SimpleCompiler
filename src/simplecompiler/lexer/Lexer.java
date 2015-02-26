@@ -5,12 +5,12 @@
  */
 package simplecompiler.lexer;
 
-import com.sun.istack.internal.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import simplecompiler.lexer.tokens.Token;
 import simplecompiler.lexer.tokens.TokenFactory;
@@ -52,61 +52,43 @@ public class Lexer {
         //// End error handling. ////
 
         // Test with bigRegExp
-//        while (leftToLex.length() != 0) {
-        Matcher m = tf.getBigPattern().matcher(str);
-        m.find();
-        System.out.println("bigRegExp:");
-        System.out.println(tf.getBigPattern().pattern());
-        System.out.println("(m.group(" + 0 + ")): " + m.group(0));
-        System.out.println("(m.group(" + 1 + ")): " + m.group(1));
-        for (int i = 2; i < m.groupCount(); i++) {
-            System.out.println(tokens.get(i - 2).NAME + " (m.group(" + i + ")): " + m.group(i));
-        }
-//        }
-        // End of test
-
-        /*
         while (leftToLex.length() != 0) {
-            Queue<TokenWithData> matches = new PriorityQueue<>((TokenWithData o1, TokenWithData o2) -> {
-                int l1 = o1.length;
-                int l2 = o2.length;
-                return (l1 == l2 ? 0 : (l1 > l2 ? -1 : 1));
-            });
-
-            int i = 0;
-            Matcher m;
-            while (i < tokens.size()) {
-                m = tokens.get(i).pattern.matcher(leftToLex);
-                if (m.find()) {
-                    matches.add(new TokenWithData(tokens.get(i), m.group(1), m.group(1).length()));
-                    System.out.println(tokens.get(i).NAME + ": " + m.group(1));
+            Matcher m = tf.getBigPattern().matcher(leftToLex);
+            m.find();
+            System.out.println("bigRegExp:");
+            System.out.println(tf.getBigPattern().pattern());
+//            System.out.println("(m.group(" + 0 + ")): " + m.group(0));
+//            System.out.println("(m.group(" + 1 + ")): " + m.group(1)); // Error token
+            // Find next biggest token
+            int tokenlength = 0;
+            int tokenIndex = 1; // Error token
+            for (int i = 2; i < m.groupCount(); i++) {
+                String group = m.group(i);
+                if (group != null && group.length() > tokenlength) {
+                    tokenlength = group.length();
+                    tokenIndex = i;
                 }
-                i++;
+//                System.out.println(tokens.get(i - 2).NAME + " (m.group(" + i + ")): " + m.group(i));
             }
-
-            TokenWithData longestMatch = matches.peek();
-            if (longestMatch == null || longestMatch.token.NAME.equals("ERROR")) { // ERROR!
-                // TODO Exception?
-                String errorMessage = "An error occured on line " + currentLine + ", unexpected token '" + leftToLex.charAt(0) + "':\n";
-                errorMessage += lines[currentLine - 1] + '\n';
-                errorMessage += errorArrow + '\n';
-                Logger.getLogger(Lexer.class).log(Level.SEVERE, errorMessage);
-//                System.out.println(errorMessage);
-            }
-            if (longestMatch != null) {
-                if (!longestMatch.token.ignore) {
-                    lexedTokens.add(longestMatch);
-                }
-                leftToLex = leftToLex.substring(longestMatch.length);
-
-                //// For error handling. ////
+            if (tokenIndex > 1) { // NO ERROR
+                TokenWithData token = new TokenWithData(tokens.get(tokenIndex - 2), m.group(tokenIndex), tokenlength);
+                // TODO check ignore
+                lexedTokens.add(token);
+//                System.out.println(token);
+                // Trim
+                leftToLex = leftToLex.substring(tokenlength);
                 // Trim while keeping track of line numbering
-                int s = longestMatch.length;
+                int s = tokenlength;
                 while (s > 0) { // Add spaces
                     errorArrow = errorArrow.substring(0, errorArrow.length() - 1) + " ^";
                     s--;
                 }
-                //// End error handling. ////
+            } else { // ERROR
+                String errorMessage = "An error occured on line " + currentLine + ", unexpected token '" + leftToLex.charAt(0) + "':\n";
+                errorMessage += lines[currentLine - 1] + '\n';
+                errorMessage += errorArrow + '\n';
+                Logger.getLogger(Lexer.class.getName()).log(Level.SEVERE, errorMessage);
+                leftToLex = leftToLex.substring(1);
             }
             //// For error handling. ////
             // Trim while keeping track of line numbering
@@ -122,8 +104,69 @@ public class Lexer {
                 leftToLex = leftToLex.substring(1);
             }
             //// End error handling. ////
+
         }
-        */
+        // End of test
+
+        /*
+         while (leftToLex.length() != 0) {
+         Queue<TokenWithData> matches = new PriorityQueue<>((TokenWithData o1, TokenWithData o2) -> {
+         int l1 = o1.length;
+         int l2 = o2.length;
+         return (l1 == l2 ? 0 : (l1 > l2 ? -1 : 1));
+         });
+
+         int i = 0;
+         Matcher m;
+         while (i < tokens.size()) {
+         m = tokens.get(i).pattern.matcher(leftToLex);
+         if (m.find()) {
+         matches.add(new TokenWithData(tokens.get(i), m.group(1), m.group(1).length()));
+         System.out.println(tokens.get(i).NAME + ": " + m.group(1));
+         }
+         i++;
+         }
+
+         TokenWithData longestMatch = matches.peek();
+         if (longestMatch == null || longestMatch.token.NAME.equals("ERROR")) { // ERROR!
+         // TODO Exception?
+         String errorMessage = "An error occured on line " + currentLine + ", unexpected token '" + leftToLex.charAt(0) + "':\n";
+         errorMessage += lines[currentLine - 1] + '\n';
+         errorMessage += errorArrow + '\n';
+         Logger.getLogger(Lexer.class).log(Level.SEVERE, errorMessage);
+         //                System.out.println(errorMessage);
+         }
+         if (longestMatch != null) {
+         if (!longestMatch.token.ignore) {
+         lexedTokens.add(longestMatch);
+         }
+         leftToLex = leftToLex.substring(longestMatch.length);
+
+         //// For error handling. ////
+         // Trim while keeping track of line numbering
+         int s = longestMatch.length;
+         while (s > 0) { // Add spaces
+         errorArrow = errorArrow.substring(0, errorArrow.length() - 1) + " ^";
+         s--;
+         }
+         //// End error handling. ////
+         }
+         //// For error handling. ////
+         // Trim while keeping track of line numbering
+         while (leftToLex.length() != 0 && leftToLex.substring(0, 1).matches("\\s")) {
+         if (leftToLex.charAt(0) == '\n') { // new line
+         currentLine++;
+         errorArrow = "^";
+         } else if (leftToLex.charAt(0) == '\t') {
+         errorArrow = errorArrow.substring(0, errorArrow.length() - 1) + "\t^";
+         } else if (leftToLex.charAt(0) == ' ') {
+         errorArrow = errorArrow.substring(0, errorArrow.length() - 1) + " ^";
+         }
+         leftToLex = leftToLex.substring(1);
+         }
+         //// End error handling. ////
+         }
+         */
     }
 
     public void printLexedString() {
@@ -182,13 +225,13 @@ public class Lexer {
 
     public static void main(String[] args) {
         Lexer lexer = new Lexer();
-        String prog = "%a := 7 ; b := c + (d := 5 + 6 , d ) $";
-//        String prog = "float match0(char *s) /* some comment */\n"
-//                + "{if (!strncmp(s, \"\\\"0.0\\\"\", 3))\n"
-//                + "\treturn 0.f;\n"
-//                + "}$";
+//        String prog = "a := 7 ; b := c + (d := 5 + 6 , d ) $";
+        String prog = "float match0(char *s) /* some comment */\n"
+                + "{if (!strncmp(s, \"\\\"0.0\\\"\", 3))\n"
+                + "\treturn 0l;\n"
+                + "}$";
         System.out.println("Lexing program:\n--------------------------------------\n" + prog + "\n--------------------------------------\n");
         lexer.lexString(prog);
-//        lexer.printLexedString();
+        lexer.printLexedString();
     }
 }

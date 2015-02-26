@@ -23,7 +23,7 @@ public class TokenFactory {
 
     public TokenFactory() {
         System.out.println("Initializing tokens ...");
-        separators = "[\\s(),\\-+*/\\^\\$!]"; // operators,...
+        separators = "[\\s(),\\-+\\*/\\^\\$!]"; // operators,...
         System.out.println("Used separators:\n\t" + separators);
         System.out.println("Used tokens:");
         tokens = new ArrayList<>();
@@ -47,10 +47,13 @@ public class TokenFactory {
         addRegExpToken("COMMENT", "(?:/\\*(?:.|\\n)*\\*/)|(?://.*)", true);
         // Variables
         addRegExpToken("ID", "[a-zA-Z](?:[a-zA-Z0-9_])*", String.class);
-        addRegExpToken("NUM", "\\d+", Integer.class);
-//        addRegExpToken("BIGNUM", "\\d+l", Long.class);
-        addRegExpToken("REAL", "(?:\\d+\\.\\d*d?)|(?:\\d*\\.\\d+d?)|(?:\\d+d)", Double.class);
         addRegExpToken("BIGREAL", "(?:\\d+\\.\\d*f)|(?:\\d*\\.\\d+f)|(?:\\d+f)", Float.class);
+        addRegExpToken("REAL", "(?:\\d+\\.\\d*d?)|(?:\\d*\\.\\d+d?)|(?:\\d+d)", Double.class);
+        addRegExpToken("BIGNUM", "\\d+l", Long.class);
+        addRegExpToken("NUM", "\\d+", Integer.class);
+//        addRegExpToken("REAL", "(?:\\d+\\.\\d*d?)|(?:\\d*\\.\\d+d?)|(?:\\d+d)", Double.class);
+//        addRegExpToken("BIGREAL", "(?:\\d+\\.\\d*f)|(?:\\d*\\.\\d+f)|(?:\\d+f)", Float.class);
+//        ((\d+)|((?:\d+\.\d*d?)|(?:\d*\.\d+d?)|(?:\d+d))|((?:\d+\.\d*f)|(?:\d*\.\d+f)|(?:\d+f)))
         addRegExpToken("STRING", "\"(?:[^\\\\]|\\\\\"|\\\\n|\\\\t|\\\\\\\\)*?\"", String.class); // TODO
         addRegExpToken("CHARACTER", "'.'", Character.class);
         // Operators
@@ -94,9 +97,9 @@ public class TokenFactory {
         addRegExpToken("SEMI", ";");
 //        addRegExpToken("COLON", ":");
         addRegExpToken("EOF", "\\$");
-        addRegExpToken("ERROR", ".", String.class, false);
+        addRegExpToken("ERROR", ".", String.class, false); // Make sure this is the last token to define!
         
-        bigPattern = Pattern.compile("^(" + bigRegExp + ")" + separators + "*?.*");
+        bigPattern = Pattern.compile("^(" + bigRegExp + ")" + separators + "*");
     }
     
     public Pattern getBigPattern() {
