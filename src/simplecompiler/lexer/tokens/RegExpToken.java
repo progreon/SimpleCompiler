@@ -11,13 +11,13 @@ public class RegExpToken extends Token {
 
     public final String regExp;
 
-    public RegExpToken(String name, String regExp, boolean hasValue, boolean ignore) {
-        super(name, Pattern.compile(regExp), hasValue, Object.class, ignore);
+    public RegExpToken(String name, String id, String regExp, boolean hasValue, boolean ignore) {
+        super(name, id, Pattern.compile(regExp), hasValue, Object.class, ignore);
         this.regExp = regExp;
     }
 
-    public RegExpToken(String name, String regExp, boolean hasValue, Class c, boolean ignore) {
-        super(name, Pattern.compile(regExp), hasValue, c, ignore);
+    public RegExpToken(String name, String id, String regExp, boolean hasValue, Class c, boolean ignore) {
+        super(name, id, Pattern.compile(regExp), hasValue, c, ignore);
         this.regExp = regExp;
     }
 

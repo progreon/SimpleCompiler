@@ -13,14 +13,16 @@ import java.util.regex.Pattern;
  */
 public abstract class Token {
 
-    public final String NAME;
+    public final String name;
+    public final String id;
     public final Pattern pattern;
     public final boolean hasData;
     public final Class c;
     public final boolean ignore;
 
-    public Token(String NAME, Pattern pattern, boolean hasValue, Class c, boolean ignore) {
-        this.NAME = NAME;
+    Token(String name, String id, Pattern pattern, boolean hasValue, Class c, boolean ignore) {
+        this.name = name;
+        this.id = id;
         this.pattern = pattern;
         this.hasData = hasValue;
         this.c = c;
