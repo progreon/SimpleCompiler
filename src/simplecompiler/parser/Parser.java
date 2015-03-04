@@ -5,6 +5,7 @@
  */
 package simplecompiler.parser;
 
+import java.util.List;
 import simplecompiler.lexer.tokens.TokenFactory;
 import simplecompiler.parser.grammar.ContextFreeGrammar;
 import simplecompiler.parser.grammar.NonTerminal;
@@ -32,6 +33,7 @@ public class Parser {
     }
     
     private void fillGrammar() {
+        
         NonTerminal s = sf.getNonTerminal(SymbolFactory.NT_S);
         NonTerminal e = sf.getNonTerminal(SymbolFactory.NT_E);
         NonTerminal l = sf.getNonTerminal(SymbolFactory.NT_L);
@@ -60,5 +62,13 @@ public class Parser {
     public static void main(String[] args) {
         Parser parser = new Parser();
         parser.grammar.printGrammar();
+        System.out.println("");
+        parser.grammar.getNullableMap();
+        System.out.println("Nullable set:");
+        parser.grammar.printNullableMap();
+        System.out.println("First set:");
+        parser.grammar.printFirstMap();
+        System.out.println("Follow set:");
+        parser.grammar.printFollowMap();
     }
 }

@@ -22,7 +22,7 @@ public class SymbolFactory {
     public static final String T_SEMI = TokenFactory.TOKEN_SEMI;
     public static final String T_ID = TokenFactory.TOKEN_ID;
     public static final String T_ASSIGN = TokenFactory.TOKEN_ASSIGN;
-    public static final String T_PRINT = TokenFactory.TOKEN_PRINT; // TODO
+    public static final String T_PRINT = TokenFactory.TOKEN_PRINT;
     public static final String T_LPAREN = TokenFactory.TOKEN_LPAREN;
     public static final String T_RPAREN = TokenFactory.TOKEN_RPAREN;
     public static final String T_NUM = TokenFactory.TOKEN_NUM;
